@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+
+  <link rel="stylesheet" href="{% static 'tracker/login.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="background">
+    <div class="login-container">
+      <h2>Login</h2>
+      <form id="login-form" method="POST">
+        {% csrf_token %}
+
+        <div class="input-group">
+          <input type="text" name="username" id="usr" placeholder="Username" required>
+          <i class="fas fa-user icon"></i>
+        </div>
+
+        <div class="input-group">
+          <input type="password" name="password" id="pwd" placeholder="Password" required>
+          <i class="fas fa-eye toggle-password icon" onclick="togglePassword()"></i>
+        </div>
+
+        <div class="options">
+          <label><input type="checkbox"> Remember me</label>
+          <a href="{% url 'password_reset' %}">Forgot Password?</a>
+        </div>
+
+        <button type="submit">Login</button>
+
+        <p class="register-link">Don't have an account? <a href="{% url 'signup' %}">Register</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading screen -->
+  <div id="loading-screen" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Logging in...</p>
+  </div>
+
+  <script>
+    function togglePassword() {
+      let passField = document.getElementById("pwd");
+      let toggleIcon = document.querySelector(".toggle-password");
+
+      if (passField.type === "password") {
+        passField.type = "text";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+      } else {
+        passField.type = "password";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+      }
+    }
+
+    document.getElementById("login-form").addEventListener("submit", function () {
+      let loginButton = document.querySelector("button");
+      let loadingScreen = document.getElementById("loading-screen");
+
+      loadingScreen.style.display = "flex";
+      loginButton.textContent = "Logging in...";
+      loginButton.disabled = true;
+    });
+  </script>
+</body>
+</html>

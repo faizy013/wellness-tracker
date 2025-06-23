@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dashboard</title>
+</head>
+<body>
+
+  {% extends "tracker/base.html" %}
+  {% block content %}
+
+  {% if messages %}
+  <div class="mb-4 space-y-2">
+    {% for message in messages %}
+      <div class="p-4 rounded text-white
+        {% if message.tags == 'error' %}bg-red-500
+        {% elif message.tags == 'warning' %}bg-yellow-500
+        {% elif message.tags == 'success' %}bg-green-500
+        {% else %}bg-blue-500{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  
+  <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}!</h2>
+  
+  <canvas id="wellnessChart" width="400" height="200" class="mb-6"></canvas>
+
+  <script>
+  const ctx = document.getElementById('wellnessChart').getContext('2d');
+  const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: {{ dates|safe }},
+          datasets: [
+              {
+                  label: 'Water (ml)',
+                  data: {{ water_data|safe }},
+                  borderColor: 'blue',
+                  fill: false
+              },
+              {
+                  label: 'Exercise (min)',
+                  data: {{ exercise_data|safe }},
+                  borderColor: 'green',
+                  fill: false
+              },
+              {
+                  label: 'Sleep (hrs)',
+                  data: {{ sleep_data|safe }},
+                  borderColor: 'purple',
+                  fill: false
+              }
+          ]
+      },
+      options: {
+          responsive: true,
+          plugins: {
+              legend: { position: 'top' },
+              title: { display: true, text: 'Wellness Trends (Past 7 Days)' }
+          }
+      }
+  });
+  </script>
+
+  
+  <h3 class="text-lg font-semibold mt-6 mb-2">Mood Entries</h3>
+  <ul class="list-disc pl-6">
+    {% for mood in mood_data %}
+      <li>{{ mood }}</li>
+    {% endfor %}
+  </ul>
+  
+  <div class="mt-6 space-x-4">
+    <a href="{% url 'add_water' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Water</a>
+    <a href="{% url 'add_exercise' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Exercise</a>
+    <a href="{% url 'add_sleep' %}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">+ Sleep</a>
+    <a href="{% url 'add_mood' %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">+ Mood</a>
+    <a href="{% url 'logout' %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 float-right">Logout</a>
+    <a href="{% url 'view_logs' %}" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition-colors duration-200">View & Search Logs</a>
+
+
+  </div>
+  
+  
+  {% endblock %}
+  
+
+
+
+  
+</body>
+</html>

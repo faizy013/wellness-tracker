@@ -1,0 +1,61 @@
+{% extends 'tracker/base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-2xl mt-10">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Add Exercise Log</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 px-4 py-2 rounded-md text-sm 
+                {% if message.tags == 'success' %}
+                    bg-green-100 text-green-800
+                {% elif message.tags == 'error' %}
+                    bg-red-100 text-red-800
+                {% else %}
+                    bg-gray-100 text-gray-800
+                {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+        
+        <div>
+            <label for="exercise_type" class="block mb-1 font-semibold text-gray-700">Exercise Type</label>
+            <input type="text" name="type" id="exercise_type"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                placeholder="e.g. Running, Gym, Yoga" required>
+        </div>
+
+        <div>
+            <label for="duration" class="block mb-1 font-semibold text-gray-700">Duration (minutes)</label>
+            <input type="number" name="duration_minutes" id="duration"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="e.g. 30" required>
+        </div>
+
+        <div>
+            <label for="date" class="block mb-1 font-semibold text-gray-700">Date</label>
+            <input type="date" name="date" id="date"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required>
+        </div>
+
+        <div>
+            <label for="notes" class="block mb-1 font-semibold text-gray-700">Notes (optional)</label>
+            <textarea name="notes" id="notes" rows="3"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Any extra details you wanna remember?"></textarea>
+        </div>
+
+        <div class="text-center">
+            <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-sm transition duration-200">
+                Save Log
+            </button>
+        </div>
+    </form>
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+</div>
+{% endblock %}

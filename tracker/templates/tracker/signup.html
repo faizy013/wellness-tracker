@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="{% static 'tracker/signup.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background">
+    <div class="login-container">
+      <h2>Create an Account</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="input-group">
+            <label style="color: white; font-weight: 600;" for="{{ field.id_for_label }}">
+              {% if field.name == "username" %}
+                Username
+              {% elif field.name == "email" %}
+                Email
+              {% elif field.name == "password1" %}
+                Password
+              {% elif field.name == "password2" %}
+                Confirm Password
+              {% else %}
+                {{ field.label }}
+              {% endif %}
+            </label>
+            {{ field }}
+            {% if field.name == "username" %}
+              <small style="color: white;">This username may contain only letters, numbers, and @/./+/-/_ characters.</small>
+            {% elif field.name == "password1" %}
+              <small style="color: white;">Must be at least 8 characters and not entirely numeric.</small>
+            {% elif field.name == "password2" %}
+              <small style="color: white;">Enter the same password as before, for verification.</small>
+            {% endif %}
+            {% if field.errors %}
+              <div style="color: red; font-size: 0.8rem;">{{ field.errors.0 }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit">Sign Up</button>
+        <p class="register-link">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
