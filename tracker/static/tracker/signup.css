@@ -2,13 +2,13 @@ body {
   font-family: 'Poppins', sans-serif;
   background: url('/static/tracker/vi.jpg') no-repeat center center fixed;
   background-size: cover;
-  height: 100vh; /* was min-height */
+  height: 100vh;
   margin: 0;
   color: #333;
   width: 100%;
 }
 ::placeholder {
-  color: rgb(255, 255, 255); /* soft white */
+  color: rgb(255, 255, 255); 
 }
   
   .background {
@@ -21,7 +21,7 @@ body {
   }
   
   .login-container {
-    background: rgba(0, 100, 80, 0.3); /* soft green overlay */
+    background: rgba(0, 100, 80, 0.3);
     border-radius: 20px;
     padding: 40px;
     width: 320px;
@@ -136,5 +136,16 @@ body {
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  .input-group small {
+    text-align: left;
+    display: block;
+    width: 80%;
+    margin: 4px auto 0 auto;
+  }
+  .input-group div {
+    text-align: left;
+    width: 80%;
+    margin: 4px auto 0 auto;
   }
   

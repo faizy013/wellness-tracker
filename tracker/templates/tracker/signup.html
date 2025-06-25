@@ -31,7 +31,7 @@
             </label>
             {{ field }}
             {% if field.name == "username" %}
-              <small class="small" style="color: white;">This username may contain only letters, numbers, and @/./+/-/_ characters.</small>
+              <small style="color: white;">This username may contain only letters, numbers, and @/./+/-/_ characters.</small>
             {% elif field.name == "password1" %}
               <small style="color: white;">Must be at least 8 characters and not entirely numeric.</small>
             {% elif field.name == "password2" %}
