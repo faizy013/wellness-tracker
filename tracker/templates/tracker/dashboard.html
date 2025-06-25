@@ -1,3 +1,8 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+
+{% load static %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -5,60 +10,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'tracker/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
     <title>Dashboard</title>
 </head>
+<style>
+  @keyframes fadeInSlide {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-slide {
+    animation: fadeInSlide 0.5s ease-out forwards;
+  }
+  </style>
+  
 <body>
-
-  {% extends "tracker/base.html" %}
-  {% block content %}
-
+  
+  
+  
   {% if messages %}
-  <div class="mb-4 space-y-2">
-    {% for message in messages %}
-      <div class="p-4 rounded text-white
-        {% if message.tags == 'error' %}bg-red-500
-        {% elif message.tags == 'warning' %}bg-yellow-500
-        {% elif message.tags == 'success' %}bg-green-500
-        {% else %}bg-blue-500{% endif %}">
-        {{ message }}
+  <div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in-slide">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+      {% for message in messages %}
+        <div class="text-lg font-semibold mb-4">
+          {% if message.tags == 'error' %}
+            ❌ Error
+          {% elif message.tags == 'warning' %}
+            ⚠️ Reminder
+          {% elif message.tags == 'success' %}
+            ✅ Success
+          {% else %}
+            🔔 Notice
+          {% endif %}
+
+        </div>
+        <div class="text-gray-700 mb-4">{{ message }}</div>
+      {% endfor %}
+      <div class="text-right">
+        <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">OK</button>
       </div>
-    {% endfor %}
+    </div>
   </div>
+
+  <script>
+    function closeModal() {
+      document.getElementById('notificationModal').style.display = 'none';
+    }
+  </script>
 {% endif %}
+
 
   
   <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}!</h2>
+
+  <div class="mt-6 space-x-4">
+    <a href="{% url 'add_water' %}" class="btn btn-blue">+ Water</a>
+    <a href="{% url 'add_exercise' %}" class="btn btn-green">+ Exercise</a>
+    <a href="{% url 'add_sleep' %}" class="btn btn-purple">+ Sleep</a>
+    <a href="{% url 'add_mood' %}" class="btn btn-yellow">+ Mood</a>
+    <a href="{% url 'logout' %}" class="btn btn-red float-right">Logout</a>
+    <a href="{% url 'view_logs' %}" class="btn btn-black">View & Search Logs</a>
+  </div>
   
-  <canvas id="wellnessChart" width="400" height="200" class="mb-6"></canvas>
+  
+  <canvas id="wellnessChart" width="600" height="200" class="mb-6"></canvas>
 
   <script>
   const ctx = document.getElementById('wellnessChart').getContext('2d');
   const chart = new Chart(ctx, {
-      type: 'line',
+      type: 'bar',
       data: {
           labels: {{ dates|safe }},
           datasets: [
-              {
-                  label: 'Water (ml)',
-                  data: {{ water_data|safe }},
-                  borderColor: 'blue',
-                  fill: false
-              },
-              {
-                  label: 'Exercise (min)',
-                  data: {{ exercise_data|safe }},
-                  borderColor: 'green',
-                  fill: false
-              },
-              {
-                  label: 'Sleep (hrs)',
-                  data: {{ sleep_data|safe }},
-                  borderColor: 'purple',
-                  fill: false
-              }
+            {
+                label: 'Water (ml)',
+                data: {{ water_data|safe }},
+                backgroundColor: 'rgba(0, 123, 255, 0.7)',  // blue
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Exercise (min)',
+                data: {{ exercise_data|safe }},
+                backgroundColor: 'rgba(40, 167, 69, 0.7)',  // green
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Sleep (hrs)',
+                data: {{ sleep_data|safe }},
+                backgroundColor: 'rgba(111, 66, 193, 0.7)',  // purple
+                borderColor: 'rgba(111, 66, 193, 1)',
+                borderWidth: 1
+            }
           ]
+
       },
       options: {
+          // indexAxis: 'y',
           responsive: true,
           plugins: {
               legend: { position: 'top' },
@@ -70,22 +120,13 @@
 
   
   <h3 class="text-lg font-semibold mt-6 mb-2">Mood Entries</h3>
-  <ul class="list-disc pl-6">
+  <ul class="flex flex-wrap gap-2 pl-0 list-none">
     {% for mood in mood_data %}
-      <li>{{ mood }}</li>
+      <li class="mood-tag">{{ mood }}</li>
     {% endfor %}
   </ul>
+
   
-  <div class="mt-6 space-x-4">
-    <a href="{% url 'add_water' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Water</a>
-    <a href="{% url 'add_exercise' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Exercise</a>
-    <a href="{% url 'add_sleep' %}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">+ Sleep</a>
-    <a href="{% url 'add_mood' %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">+ Mood</a>
-    <a href="{% url 'logout' %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 float-right">Logout</a>
-    <a href="{% url 'view_logs' %}" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition-colors duration-200">View & Search Logs</a>
-
-
-  </div>
   
   
   {% endblock %}

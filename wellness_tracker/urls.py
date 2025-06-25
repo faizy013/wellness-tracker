@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from tracker import views as tracker_views
 from django.shortcuts import redirect
+from django.contrib.auth.views import LogoutView
+
 
 
 
@@ -34,6 +36,8 @@ urlpatterns = [
     path('add-sleep/', tracker_views.add_sleep_log, name='add_sleep'),
     path('add-mood/', tracker_views.add_mood_log, name='add_mood'),
     path('logs/', tracker_views.view_logs, name='view_logs'),
+    path('login/', LogoutView.as_view(next_page='login'), name='logout'),
+
 
     path('password-reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html'), name='password_reset'),
 

@@ -1,13 +1,18 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    height: 100%;
-    background: linear-gradient(#3b1c88, #5a2ea6);
-  }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: url('/static/tracker/vi.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh; /* was min-height */
+  margin: 0;
+  color: #333;
+  width: 100%;
+}
+::placeholder {
+  color: rgb(255, 255, 255); /* soft white */
+}
   
   .background {
-    background: linear-gradient(#1a632a, #528d05);
+    /* background: linear-gradient(#1a632a, #528d05); */
     background-size: cover;
     height: 100vh;
     display: flex;
@@ -16,15 +21,16 @@ body, html {
   }
   
   .login-container {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 100, 80, 0.3); /* soft green overlay */
     border-radius: 20px;
     padding: 40px;
     width: 320px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    box-shadow: 0 8px 32px 0 rgba(0, 100, 80, 0.4);
     color: white;
     text-align: center;
   }
+  
   
   .login-container h2 {
     font-weight: 600;
@@ -76,15 +82,15 @@ body, html {
     padding: 12px;
     border: none;
     border-radius: 9999px;
-    background: white;
-    color: #528d05;
+    background: #00674b;
+    color: #ffff;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease;
   }
   
   button:hover {
-    background: #ddd;
+    background: #004526;
   }
   
   .register-link {

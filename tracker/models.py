@@ -1,10 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+from django.db import models
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    level = models.CharField(max_length=20, default='info')  # info, warning, success, error
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class WaterLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     amount_ml = models.IntegerField()
+
+    @property
+    def search_text(self):
+        return f"Water {self.user.username} - {self.amount_ml}ml on {self.date}"
 
     def __str__(self):
         return f"{self.user.username} - {self.amount_ml}ml on {self.date}"
@@ -16,6 +30,10 @@ class ExerciseLog(models.Model):
     duration_minutes = models.IntegerField()
     notes = models.TextField(blank=True, null=True)  # optional notes
 
+    @property
+    def search_text(self):
+        return f" Exercise {self.user.username} - {self.type} for {self.duration_minutes} min"
+
     def __str__(self):
         return f"{self.user.username} - {self.type} for {self.duration_minutes} min"
 
@@ -25,6 +43,10 @@ class SleepLog(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
+    @property
+    def search_text(self):
+        # No notes, so just format start/end time as string
+        return f"Sleep {self.user.username} - Sleep from {self.start_time} to {self.end_time}"
     def __str__(self):
         return f"{self.user.username} - Sleep from {self.start_time} to {self.end_time}"
 
@@ -33,6 +55,10 @@ class MoodLog(models.Model):
     date = models.DateField(auto_now_add=True)
     mood = models.CharField(max_length=50)
     note = models.TextField(blank=True, null=True)
+
+    @property
+    def search_text(self):
+        return f"{self.user.username} - Mood: {self.mood} on {self.date}"
 
     def __str__(self):
         return f"{self.user.username} - Mood: {self.mood} on {self.date}"

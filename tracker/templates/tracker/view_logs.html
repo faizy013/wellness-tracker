@@ -1,21 +1,26 @@
 {% extends "tracker/base.html" %}
+{% load static %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'tracker/view_logs.css' %}">
 
-<form method="GET" class="mb-6 flex flex-wrap gap-4 items-end">
+<div class="log-wrapper">
+
+  <!-- Filter Form -->
+  <form method="GET">
+    <div>
+      <label for="start_date">Start Date</label>
+      <input type="date" id="start_date" name="start_date" value="{{ start_date }}" />
+    </div>
 
     <div>
-      <label for="start_date" class="block mb-1 font-semibold">Start Date</label>
-      <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="border p-2 rounded" />
+      <label for="end_date">End Date</label>
+      <input type="date" id="end_date" name="end_date" value="{{ end_date }}" />
     </div>
-  
+
     <div>
-      <label for="end_date" class="block mb-1 font-semibold">End Date</label>
-      <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="border p-2 rounded" />
-    </div>
-  
-    <div>
-      <label for="activity_type" class="block mb-1 font-semibold">Activity Type</label>
-      <select id="activity_type" name="activity_type" class="border p-2 rounded">
+      <label for="activity_type">Activity Type</label>
+      <select id="activity_type" name="activity_type">
         <option value="" {% if not activity_type %}selected{% endif %}>All</option>
         <option value="water" {% if activity_type == "water" %}selected{% endif %}>Water Intake</option>
         <option value="exercise" {% if activity_type == "exercise" %}selected{% endif %}>Exercise</option>
@@ -23,53 +28,52 @@
         <option value="mood" {% if activity_type == "mood" %}selected{% endif %}>Mood</option>
       </select>
     </div>
-  
+
     <div>
-      <label for="search_term" class="block mb-1 font-semibold">Search</label>
-      <input type="text" id="search_term" name="search_term" placeholder="Search exercise type or mood note" value="{{ search_term }}" class="border p-2 rounded" />
+      <label for="search_term">Search</label>
+      <input type="text" id="search_term" name="search_term" placeholder="Search exercise type or mood note" value="{{ search_term }}" />
     </div>
-  
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filter</button>
-  
+
+    <button type="submit">Filter</button>
   </form>
-  
 
-<div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-xl">
-  <h2 class="text-2xl font-bold mb-4">Your Logs</h2>
-
-  <!-- Filter form here if you have one -->
+  <h2>Your Logs</h2>
 
   {% if page_obj %}
-    {% for log in page_obj %}
-      <div class="mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
-        {% if log.model_name == "WaterLog" %}
-          💧 <strong>Water:</strong> {{ log.amount_ml }} ml on {{ log.date }}
-        {% elif log.model_name == "ExerciseLog" %}
+    <div class="logs-grid">
+      {% for log in page_obj %}
+        <div class="log-card">
+          {% if log.model_name == "WaterLog" %}
+            💧 <strong>Water:</strong> {{ log.amount_ml }} ml on {{ log.date }}
+          {% elif log.model_name == "ExerciseLog" %}
             🏋️ <strong>Exercise:</strong> {{ log.type }} for {{ log.duration_minutes }} min on {{ log.date }}
-        {% elif log.model_name == "SleepLog" %}
+          {% elif log.model_name == "SleepLog" %}
             😴 <strong>Sleep:</strong> {{ log.start_time|date:"M d, H:i" }} to {{ log.end_time|date:"H:i" }}
-        {% elif log.model_name == "MoodLog" %}
+          {% elif log.model_name == "MoodLog" %}
             😊 <strong>Mood:</strong> {{ log.mood }} on {{ log.date }}
-        {% if log.note %}<br><em>{{ log.note }}</em>{% endif %}
-        {% else %}
+            {% if log.note %}<br><em>{{ log.note }}</em>{% endif %}
+          {% else %}
             ⚠️ Unknown log type
-        {% endif %}
-      </div>
-    {% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
 
     <!-- Pagination controls -->
-    <div class="mt-4 flex justify-between items-center">
+    <div class="mt-4">
       {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="text-blue-600">Previous</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
       {% endif %}
       <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="text-blue-600">Next</a>
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
       {% endif %}
     </div>
   {% else %}
     <p>No logs found.</p>
   {% endif %}
-  <a href="{% url 'dashboard' %}" style="margin-top:30px;">Back to Dashboard</a>
+
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+
 </div>
 {% endblock %}

@@ -11,8 +11,17 @@ from .models import WaterLog, ExerciseLog, SleepLog, MoodLog
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import datetime, time
+from .forms import SignUpForm 
 # import pytz
 from django.utils.timezone import make_aware, is_aware, get_current_timezone
+from datetime import datetime
+def filter_by_search(queryset, search_term):
+    if not search_term:
+        return queryset
+    search_term = search_term.lower()
+    return [obj for obj in queryset if search_term in obj.search_text.lower()]
+
+
 
 
 @login_required
@@ -26,14 +35,23 @@ def dashboard_view(request):
     mood_logs = MoodLog.objects.filter(user=request.user, date__range=[week_ago, today])
 
     # 👇 NEW: Check if user hasn't logged anything today
-    has_logs_today = (
-        WaterLog.objects.filter(user=request.user, date=today).exists() or
-        ExerciseLog.objects.filter(user=request.user, date=today).exists() or
-        SleepLog.objects.filter(user=request.user, start_time__date=today).exists() or
-        MoodLog.objects.filter(user=request.user, date=today).exists()
-    )
-    if not has_logs_today:
-        messages.warning(request, "👋 Don't forget to log your wellness activities today!")
+    missing_logs = []
+
+    if not WaterLog.objects.filter(user=request.user, date=today).exists():
+        missing_logs.append("💧 water")
+    if not ExerciseLog.objects.filter(user=request.user, date=today).exists():
+        missing_logs.append("🏋️ exercise")
+    if not SleepLog.objects.filter(user=request.user, start_time__date=today).exists():
+        missing_logs.append("😴 sleep")
+    if not MoodLog.objects.filter(user=request.user, date=today).exists():
+        missing_logs.append("😊 mood")
+
+    # Only show once per day
+    if missing_logs and request.session.get('reminder_shown') != str(today):
+        msg = "👋 You haven't logged your " + ", ".join(missing_logs) + " today!"
+        messages.warning(request, msg)
+        request.session['reminder_shown'] = str(today)
+
 
     # Weekly Data Prep
     dates = [(week_ago + timedelta(days=i)) for i in range(7)]
@@ -67,17 +85,17 @@ def dashboard_view(request):
 
     return render(request, 'tracker/dashboard.html', context)
 
-
 @login_required
 def view_logs(request):
     user = request.user
 
-    # Get filters
+    # Filters from GET
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     activity_type = request.GET.get('activity_type')
     search_term = request.GET.get('search_term', '').strip()
 
+    # Base querysets
     water_logs = WaterLog.objects.filter(user=user)
     exercise_logs = ExerciseLog.objects.filter(user=user)
     sleep_logs = SleepLog.objects.filter(user=user)
@@ -96,50 +114,49 @@ def view_logs(request):
         sleep_logs = sleep_logs.filter(start_time__date__lte=end_date)
         mood_logs = mood_logs.filter(date__lte=end_date)
 
-    # Filter by activity type and search term
+    # Filter by activity_type if specified
     if activity_type:
         if activity_type == 'water':
-            filtered_logs = water_logs.order_by('-date')
+            filtered_logs = water_logs
         elif activity_type == 'exercise':
-            filtered_logs = (exercise_logs.filter(type__icontains=search_term).order_by('-date')
-                             if search_term else exercise_logs.order_by('-date'))
+            filtered_logs = exercise_logs
         elif activity_type == 'sleep':
-            filtered_logs = sleep_logs.order_by('-start_time')
+            filtered_logs = sleep_logs
         elif activity_type == 'mood':
-            filtered_logs = (mood_logs.filter(Q(mood__icontains=search_term) | Q(note__icontains=search_term)).order_by('-date')
-                             if search_term else mood_logs.order_by('-date'))
+            filtered_logs = mood_logs
         else:
             filtered_logs = []
-        # Add model_name attr for filtered logs so template knows the type
-        for log in filtered_logs:
-            log.model_name = log.__class__.__name__
+
+        # Apply search filtering in Python for that queryset
+        filtered_logs = filter_by_search(filtered_logs, search_term)
+
     else:
-        # Combine all logs and add model_name attribute
+        # No activity type selected: combine all and filter by search
         combined_logs = list(water_logs) + list(exercise_logs) + list(sleep_logs) + list(mood_logs)
-        for log in combined_logs:
-            log.model_name = log.__class__.__name__
+        filtered_logs = [log for log in combined_logs if search_term.lower() in log.search_text.lower()] if search_term else combined_logs
 
-        # Sorting helper: convert date to datetime for consistent comparison
-        def sort_key(log):
-            dt = getattr(log, 'date', None)
-            if dt is None:
-                dt = getattr(log, 'start_time', None)
+    # Add model_name for template
+    for log in filtered_logs:
+        log.model_name = log.__class__.__name__
 
-            if dt is None:
-                return datetime.min.replace(tzinfo=get_current_timezone())  # fallback
+    # Sort logs by date/time
+    def sort_key(log):
+        dt = getattr(log, 'date', None)
+        if dt is None:
+            dt = getattr(log, 'start_time', None)
 
-            if isinstance(dt, datetime):
-                if not is_aware(dt):
-                    # make naive datetime aware in current timezone
-                    return make_aware(dt, get_current_timezone())
-                return dt
+        if dt is None:
+            return datetime.min.replace(tzinfo=get_current_timezone())
 
-            # dt is a date object, make aware datetime with time.min
-            aware_dt = datetime.combine(dt, time.min)
-            return make_aware(aware_dt, get_current_timezone())
+        if isinstance(dt, datetime):
+            if not is_aware(dt):
+                return make_aware(dt, get_current_timezone())
+            return dt
 
-        combined_logs.sort(key=sort_key, reverse=True)
-        filtered_logs = combined_logs
+        aware_dt = datetime.combine(dt, time.min)
+        return make_aware(aware_dt, get_current_timezone())
+
+    filtered_logs.sort(key=sort_key, reverse=True)
 
     # Pagination
     paginator = Paginator(filtered_logs, 10)
@@ -153,73 +170,8 @@ def view_logs(request):
         'activity_type': activity_type,
         'search_term': search_term,
     }
+
     return render(request, 'tracker/view_logs.html', context)
-
-# @login_required
-# def view_logs(request):
-#     user = request.user
-
-#     # Get filter params from GET request
-#     start_date = request.GET.get('start_date')
-#     end_date = request.GET.get('end_date')
-#     activity_type = request.GET.get('activity_type')
-#     search_term = request.GET.get('search_term', '').strip()
-
-#     is_filtered = start_date or end_date or activity_type or search_term
-
-#     water_logs = WaterLog.objects.filter(user=user)
-#     exercise_logs = ExerciseLog.objects.filter(user=user)
-#     sleep_logs = SleepLog.objects.filter(user=user)
-#     mood_logs = MoodLog.objects.filter(user=user)
-
-#     if is_filtered:
-#         if start_date:
-#             water_logs = water_logs.filter(date__gte=start_date)
-#             exercise_logs = exercise_logs.filter(date__gte=start_date)
-#             sleep_logs = sleep_logs.filter(start_time__date__gte=start_date)
-#             mood_logs = mood_logs.filter(date__gte=start_date)
-
-#         if end_date:
-#             water_logs = water_logs.filter(date__lte=end_date)
-#             exercise_logs = exercise_logs.filter(date__lte=end_date)
-#             sleep_logs = sleep_logs.filter(start_time__date__lte=end_date)
-#             mood_logs = mood_logs.filter(date__lte=end_date)
-
-#         if activity_type == 'water':
-#             filtered_logs = water_logs.order_by('-date')
-#         elif activity_type == 'exercise':
-#             filtered_logs = exercise_logs.order_by('-date')
-#             if search_term:
-#                 filtered_logs = filtered_logs.filter(type__icontains=search_term)
-#         elif activity_type == 'sleep':
-#             filtered_logs = sleep_logs.order_by('-start_time')
-#         elif activity_type == 'mood':
-#             filtered_logs = mood_logs.order_by('-date')
-#             if search_term:
-#                 filtered_logs = filtered_logs.filter(
-#                     Q(mood__icontains=search_term) | Q(note__icontains=search_term)
-#                 )
-#         else:
-#             filtered_logs = []
-#     else:
-#         # No filters used: show all logs together (default view)
-#         combined_logs = list(water_logs) + list(exercise_logs) + list(sleep_logs) + list(mood_logs)
-#         combined_logs.sort(key=lambda log: getattr(log, 'date', getattr(log, 'start_time', date.min)), reverse=True)
-#         filtered_logs = combined_logs
-
-#     # Pagination
-#     paginator = Paginator(filtered_logs, 10)
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-
-#     context = {
-#         'page_obj': page_obj,
-#         'start_date': start_date,
-#         'end_date': end_date,
-#         'activity_type': activity_type,
-#         'search_term': search_term,
-#     }
-#     return render(request, 'tracker/view_logs.html', context)
 
 
 @login_required
@@ -283,12 +235,8 @@ def signup_view(request):
             login(request, user)
             return redirect('dashboard')
     else:
-        form = UserCreationForm()
+        form = SignUpForm()
     return render(request, 'tracker/signup.html', {'form': form})
 
 
 
-
-@login_required
-def dashboard_view(request):
-    return render(request, 'tracker/dashboard.html')
