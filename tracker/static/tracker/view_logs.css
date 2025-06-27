@@ -1,218 +1,209 @@
-    /* ===================== */
-    /* Base Styling & Theme  */
-    /* ===================== */
+/* ===================== */
+/* Base Styling & Theme  */
+/* ===================== */
+body {
+    background: linear-gradient(135deg, #fce4ec, #f3f0ff); /* blush pink to soft lavender */
+    font-family: 'Poppins', sans-serif;
+    color: #6a5acd; /* lavender text */
+    margin: 0;
+    padding: 0;
+}
 
-    body {
-        background: linear-gradient(135deg, #e8f5e9, #ffffff);
-        font-family: 'Poppins', sans-serif;
-        color: #004526;
-        margin: 0;
-        padding: 0;
-    }
-    
-    /* ===================== */
-    /* Unified Wrapper       */
-    /* ===================== */
-    
-    .log-wrapper {
-        background-color: #ffffff;
-        border: 2px solid #2E8B57;
-        border-radius: 1.5rem;
-        box-shadow: 0 6px 12px rgba(0, 100, 80, 0.15);
-        padding: 2rem;
-        max-width: 90%;
-        margin: 2rem auto;
-    }
-    
-    /* ===================== */
-    /* Filter Form Styling   */
-    /* ===================== */
-    
-    form {
-        background: #e6fff0;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: inset 0 0 4px rgba(0, 100, 80, 0.1);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        justify-content: space-between;
-    }
-    
-    form label {
-        color: #004526;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-    
-    form input,
-    form select {
-        padding: 0.6rem 1.5rem;
-        border-radius: 1rem;
-        border: 2px solid #006241;
-        width: 100%;
-        max-width: 200px;
-        transition: border 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    form input::placeholder {
-        color: #6b8f7e;
-        opacity: 0.8;
-    }
-    
-    form input:focus,
-    form select:focus {
-        outline: none;
-        border-color: #004526;
-        box-shadow: 0 0 5px rgba(0, 69, 38, 0.3);
-    }
-    
-    form button {
-        background: #00674b;
-        color: #fff;
-        padding: 10px 80px;
-        font-weight: 600;
-        border-radius: 1rem;
-        transition: background 0.3s ease;
-        border: none;
-        margin-top: 1.25rem;
-    }
-    
-    form button:hover {
-        background: #004526;
-    }
-    
-    /* ===================== */
-    /* Logs Section          */
-    /* ===================== */
-    
-    h2 {
-        text-align: center;
-        font-size: 2rem;
-        color: #006241;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-    }
-    
-    /* Grid layout */
-    .logs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-        animation: fadeSlideIn 0.8s ease-in-out;
-    }
-    
-    /* Log cards */
-    .log-card {
-        background: #f6fff9;
-        border: 2px solid #cceede;
-        padding: 1.2rem 1.5rem;
-        border-radius: 1rem;
-        transition: transform 0.2s ease;
+/* ===================== */
+/* Unified Wrapper       */
+/* ===================== */
+.log-wrapper {
+    background-color: #ffffff;
+    border: 2px solid #d8b4fe; /* soft lavender border */
+    border-radius: 1.5rem;
+    box-shadow: 0 6px 12px rgba(186, 104, 200, 0.15); /* soft purple shadow */
+    padding: 2rem;
+    max-width: 90%;
+    margin: 2rem auto;
+}
+
+/* ===================== */
+/* Filter Form Styling   */
+/* ===================== */
+form {
+    background: #fdf4ff; /* lavender blush */
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 4px rgba(218, 112, 214, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+form label {
+    color: #ba55d3; /* orchid */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+form input,
+form select {
+    padding: 0.6rem 1.5rem;
+    border-radius: 1rem;
+    border: 2px solid #dda0dd; /* plum */
+    width: 100%;
+    max-width: 200px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+form input::placeholder {
+    color: #9370db; /* medium purple */
+    opacity: 0.8;
+}
+
+form input:focus,
+form select:focus {
+    outline: none;
+    border-color: #ba55d3;
+    box-shadow: 0 0 5px rgba(186, 85, 211, 0.3);
+}
+
+form button {
+    background: #c084fc; /* light lavender */
+    color: #fff;
+    padding: 10px 80px;
+    font-weight: 600;
+    border-radius: 1rem;
+    transition: background 0.3s ease;
+    border: none;
+    margin-top: 1.25rem;
+}
+
+form button:hover {
+    background: #9333ea;
+}
+
+/* ===================== */
+/* Logs Section          */
+/* ===================== */
+h2 {
+    text-align: center;
+    font-size: 2rem;
+    color: #8e44ad; /* lavender plum */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.logs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    animation: fadeSlideIn 0.8s ease-in-out;
+}
+
+.log-card {
+    background: #f9f5ff;
+    border: 2px solid #eedcff;
+    padding: 1.2rem 1.5rem;
+    border-radius: 1rem;
+    transition: transform 0.2s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeSlideIn 0.6s ease forwards;
+}
+
+.logs-grid .log-card:nth-child(1) { animation-delay: 0.1s; }
+.logs-grid .log-card:nth-child(2) { animation-delay: 0.2s; }
+.logs-grid .log-card:nth-child(3) { animation-delay: 0.3s; }
+.logs-grid .log-card:nth-child(4) { animation-delay: 0.4s; }
+.logs-grid .log-card:nth-child(5) { animation-delay: 0.5s; }
+
+.log-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(147, 51, 234, 0.15); /* purple hover */
+}
+
+strong {
+    color: #ba55d3;
+}
+
+em {
+    color: #9370db;
+    font-style: italic;
+}
+
+/* ===================== */
+/* Pagination Buttons    */
+/* ===================== */
+div.mt-4 {
+    margin-top: 2rem;
+    text-align: center;
+    color: #6a5acd;
+    font-weight: 500;
+}
+
+div.mt-4 a {
+    color: white;
+    font-weight: 600;
+    margin: 0 1rem;
+    transition: background 0.2s ease;
+    display: inline-block;
+    text-decoration: none;
+    background: #b19cd9; /* soft lavender */
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+}
+
+div.mt-4 a:hover {
+    background: #8b5cf6;
+}
+
+/* ===================== */
+/* Animations            */
+/* ===================== */
+@keyframes fadeSlideIn {
+    from {
         opacity: 0;
         transform: translateY(20px);
-        animation: fadeSlideIn 0.6s ease forwards;
     }
-    
-    /* Animate each card with a small delay */
-    .logs-grid .log-card:nth-child(1) { animation-delay: 0.1s; }
-    .logs-grid .log-card:nth-child(2) { animation-delay: 0.2s; }
-    .logs-grid .log-card:nth-child(3) { animation-delay: 0.3s; }
-    .logs-grid .log-card:nth-child(4) { animation-delay: 0.4s; }
-    .logs-grid .log-card:nth-child(5) { animation-delay: 0.5s; }
-    /* Add more if you want */
-    
-    .log-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 8px rgba(0, 100, 80, 0.1);
-    }
-    
-    /* Emphasis */
-    strong {
-        color: #004526;
-    }
-    
-    em {
-        color: #2E8B57;
-        font-style: italic;
-    }
-    
-    /* ===================== */
-    /* Pagination Buttons    */
-    /* ===================== */
-    
-    div.mt-4 {
-        margin-top: 2rem;
-        text-align: center;
-        color: #004526;
-        font-weight: 500;
-    }
-    
-    div.mt-4 a {
-        color: #00674b;
-        font-weight: 600;
-        margin: 0 1rem;
-        transition: color 0.2s ease;
-        display: inline-block;
-        text-decoration: none;
-        background: #2E8B57;
-        padding: 0.6rem 1rem;
-        border-radius: 0.5rem;
-    }
-    
-    div.mt-4 a:hover {
-        background: #00674b;
-        color: #fff;
-    }
-    
-    /* ===================== */
-    /* Animations            */
-    /* ===================== */
-    
-    @keyframes fadeSlideIn {
-        from {
-        opacity: 0;
-        transform: translateY(20px);
-        }
-        to {
+    to {
         opacity: 1;
         transform: translateY(0);
-        }
     }
-    
-    /* ===================== */
-    /* Responsive Tweaks     */
-    /* ===================== */
-    
-    @media (max-width: 768px) {
-        form {
+}
+
+/* ===================== */
+/* Responsive Tweaks     */
+/* ===================== */
+@media (max-width: 768px) {
+    form {
         flex-direction: column;
         align-items: stretch;
-        }
-    
-        form input,
-        form select {
-        max-width: 100%;
-        }
-    
-        .logs-grid {
-        grid-template-columns: 1fr;
-        }
-    }
-    a {
-        display: inline-block;
-        text-decoration: none;
-        background: #2E8B57; /* medium green */
-        color: white;
-        padding: 0.6rem 1rem;
-        border-radius: 0.5rem;
-        transition: background 0.3s ease;
-        margin-top: 1.2rem;
-        text-align: center;
     }
 
-    a:hover {
-        background: #00674b;
+    form input,
+    form select {
+        max-width: 100%;
     }
+
+    .logs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===================== */
+/* Link Button Fix       */
+/* ===================== */
+a {
+    display: inline-block;
+    text-decoration: none;
+    background: #c084fc;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    transition: background 0.3s ease;
+    margin-top: 1.2rem;
+    text-align: center;
+}
+
+a:hover {
+    background: #9333ea;
+}

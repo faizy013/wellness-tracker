@@ -15,6 +15,7 @@ from .forms import SignUpForm
 # import pytz
 from django.utils.timezone import make_aware, is_aware, get_current_timezone
 from datetime import datetime
+
 def filter_by_search(queryset, search_term):
     if not search_term:
         return queryset
@@ -174,18 +175,36 @@ def view_logs(request):
     return render(request, 'tracker/view_logs.html', context)
 
 
+from django.utils import timezone
+
 @login_required
 def add_water_log(request):
+    user = request.user
+    today = date.today()
+    total_logged = WaterLog.objects.filter(user=user, date=today).aggregate(Sum('amount_ml'))['amount_ml__sum'] or 0
+
+    goal = 1900
+    percent = round((total_logged / goal) * 100, 1) if goal > 0 else 0
+
     if request.method == 'POST':
         form = WaterLogForm(request.POST)
         if form.is_valid():
             water_log = form.save(commit=False)
             water_log.user = request.user
+            water_log.date = today
+            water_log.timestamp = timezone.now()  # Set the datetime
             water_log.save()
-            return redirect('dashboard')
+            return redirect('dashboard')  # redirect to same page
     else:
         form = WaterLogForm()
-    return render(request, 'tracker/add_water_log.html', {'form': form})
+
+    context = {
+        'form': form,
+        'total_logged': total_logged,
+        'goal': goal,
+        'percent': percent,
+    }
+    return render(request, 'tracker/add_water_log.html', context)
 
 @login_required
 def add_exercise_log(request):

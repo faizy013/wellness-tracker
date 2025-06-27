@@ -1,139 +1,167 @@
 {% extends "tracker/base.html" %}
-{% block content %}
-
 {% load static %}
 
-
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{% static 'tracker/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
     <title>Dashboard</title>
-</head>
-<style>
-  @keyframes fadeInSlide {
-    0% { opacity: 0; transform: translateY(-20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  .fade-in-slide {
-    animation: fadeInSlide 0.5s ease-out forwards;
-  }
-  </style>
-  
-<body>
-  
-  
-  
-  {% if messages %}
-  <div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in-slide">
-    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-      {% for message in messages %}
-        <div class="text-lg font-semibold mb-4">
-          {% if message.tags == 'error' %}
-            ❌ Error
-          {% elif message.tags == 'warning' %}
-            ⚠️ Reminder
-          {% elif message.tags == 'success' %}
-            ✅ Success
-          {% else %}
-            🔔 Notice
-          {% endif %}
 
-        </div>
-        <div class="text-gray-700 mb-4">{{ message }}</div>
-      {% endfor %}
-      <div class="text-right">
-        <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">OK</button>
+</head>
+
+<body>
+
+{% if messages %}
+<div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in-slide">
+  <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+    {% for message in messages %}
+      <div class="text-lg font-semibold mb-4">
+        {% if message.tags == 'error' %}
+          ❌ Error
+        {% elif message.tags == 'warning' %}
+          ⚠️ Reminder
+        {% elif message.tags == 'success' %}
+          ✅ Success
+        {% else %}
+          🔔 Notice
+        {% endif %}
       </div>
+      <div class="text-gray-700 mb-4">{{ message }}</div>
+    {% endfor %}
+    <div class="text-right">
+      <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">OK</button>
     </div>
   </div>
+</div>
 
-  <script>
-    function closeModal() {
-      document.getElementById('notificationModal').style.display = 'none';
-    }
-  </script>
+<script>
+  function closeModal() {
+    document.getElementById('notificationModal').style.display = 'none';
+  }
+</script>
 {% endif %}
 
+<!-- Top Heading -->
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-2xl font-bold">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!</h2>
+  <a href="{% url 'logout' %}" class="logout-btn btn-red">Logout</a>
+</div>
 
-  
-  <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}!</h2>
+<!-- Main Grid Layout -->
+<div class="dashboard-grid">
 
-  <div class="mt-6 space-x-4">
-    <a href="{% url 'add_water' %}" class="btn btn-blue">+ Water</a>
-    <a href="{% url 'add_exercise' %}" class="btn btn-green">+ Exercise</a>
-    <a href="{% url 'add_sleep' %}" class="btn btn-purple">+ Sleep</a>
-    <a href="{% url 'add_mood' %}" class="btn btn-yellow">+ Mood</a>
-    <a href="{% url 'logout' %}" class="btn btn-red float-right">Logout</a>
-    <a href="{% url 'view_logs' %}" class="btn btn-black">View & Search Logs</a>
+  <!-- Left Buttons -->
+  <div class="icon-buttons">
+    <a href="{% url 'add_water' %}" class="icon-btn water-icon" title="Log Water"></a>
+    <a href="{% url 'add_sleep' %}" class="icon-btn sleep-icon" title="Log Sleep"></a>
+    <a href="{% url 'add_exercise' %}" class="icon-btn workout-icon" title="Log Workout"></a>
+    <a href="{% url 'add_mood' %}" class="icon-btn mood-icon" title="Log Mood"></a>
+    <a href="{% url 'view_logs' %}" class="log-btn">VIEW LOGS</a>
   </div>
-  
-  
-  <canvas id="wellnessChart" width="600" height="200" class="mb-6"></canvas>
 
-  <script>
+  <!-- Chart Area -->
+  <div class="chart-section">
+    <div class="chart-toggle">
+      <button class="toggle-btn active" onclick="switchDataset('all', event)">ALL</button>
+      <button class="toggle-btn" onclick="switchDataset('water', event)">WATER</button>
+      <button class="toggle-btn" onclick="switchDataset('sleep', event)">SLEEP</button>
+      <button class="toggle-btn" onclick="switchDataset('workout', event)">WORKOUT</button>
+    </div>
+    
+    <canvas id="wellnessChart" width="600" height="300" class="mb-4"></canvas>
+    
+    <!-- Mood Emojis -->
+    <div class="emoji-row">
+      {% for mood in mood_data %}
+        {% if mood == "Happy" %}
+          <span>😊</span>
+        {% elif mood == "Sad" %}
+          <span>😢</span>
+        {% elif mood == "Angry" %}
+          <span>😠</span>
+        {% elif mood == "Anxious" %}
+          <span>😰</span>
+        {% elif mood == "Excited" %}
+          <span>😄</span>
+        {% elif mood == "Neutral" %}
+          <span>😐</span>
+        {% else %}
+          <span>❓</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
   const ctx = document.getElementById('wellnessChart').getContext('2d');
-  const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-          labels: {{ dates|safe }},
-          datasets: [
-            {
-                label: 'Water (ml)',
-                data: {{ water_data|safe }},
-                backgroundColor: 'rgba(0, 123, 255, 0.7)',  // blue
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 1
-            },
-            {
-                label: 'Exercise (min)',
-                data: {{ exercise_data|safe }},
-                backgroundColor: 'rgba(40, 167, 69, 0.7)',  // green
-                borderColor: 'rgba(40, 167, 69, 1)',
-                borderWidth: 1
-            },
-            {
-                label: 'Sleep (hrs)',
-                data: {{ sleep_data|safe }},
-                backgroundColor: 'rgba(111, 66, 193, 0.7)',  // purple
-                borderColor: 'rgba(111, 66, 193, 1)',
-                borderWidth: 1
-            }
-          ]
 
+  const dataMap = {
+    water: {
+      label: 'Water (ml)',
+      data: {{ water_data|safe }},
+      backgroundColor: '#ff6f61',
+      borderColor: '#ff6f61',
+      fill: false,
+      tension: 0.4,
+      borderWidth: 5
+    },
+    sleep: {
+      label: 'Sleep (hrs)',
+      data: {{ sleep_data|safe }},
+      backgroundColor: '#9333ea',
+      borderColor: '#9333ea',
+      fill: false,
+      tension: 0.4,
+      borderWidth: 5
+    },
+    workout: {
+      label: 'Workout (min)',
+      data: {{ exercise_data|safe }},
+      backgroundColor: '#10b981',
+      borderColor: '#10b981',
+      fill: false,
+      tension: 0.4,
+      borderWidth: 5
+    },
+  };
+
+  let chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ dates|safe }},
+      datasets: [dataMap.water, dataMap.sleep, dataMap.workout]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+        title: { display: false }
       },
-      options: {
-          // indexAxis: 'y',
-          responsive: true,
-          plugins: {
-              legend: { position: 'top' },
-              title: { display: true, text: 'Wellness Trends (Past 7 Days)' }
-          }
+      scales: {
+        y: { beginAtZero: true }
       }
+    }
   });
-  </script>
 
-  
-  <h3 class="text-lg font-semibold mt-6 mb-2">Mood Entries</h3>
-  <ul class="flex flex-wrap gap-2 pl-0 list-none">
-    {% for mood in mood_data %}
-      <li class="mood-tag">{{ mood }}</li>
-    {% endfor %}
-  </ul>
+  function switchDataset(type, event) {
+    document.querySelectorAll(".toggle-btn").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
 
-  
-  
-  
-  {% endblock %}
-  
+    if (type === 'all') {
+      chart.data.datasets = [dataMap.water, dataMap.sleep, dataMap.workout];
+    } else {
+      chart.data.datasets = [dataMap[type]];
+    }
 
-
-
-  
+    chart.update();
+  }
+</script>
 </body>
 </html>
+{% endblock %}

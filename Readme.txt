@@ -83,6 +83,43 @@ pip install django
 pip install django-webpush pywebpush cryptography
 pip install celery django-celery-beat
 
+--------------------------------------------------------------------------------
+📧 DAILY EMAIL REMINDER SYSTEM (APScheduler)
+--------------------------------------------------------------------------------
+
+Automatically reminds users twice a day via email to log their wellness activity.
+
+⏰ Schedule:
+- 08:00 AM
+- 08:00 PM
+
+🔁 Logic:
+- For each user, check if they’ve logged any of these today:
+  💧 WaterLog, 🏋️ ExerciseLog, 😴 SleepLog, 😊 MoodLog
+- If not → send them an email reminder
+
+🛠 Libraries used:
+pip install apscheduler
+
+📂 Main File:
+tracker/scheduler.py
+
+👁 Inside scheduler.py:
+- Uses `BackgroundScheduler` from APScheduler
+- Imports Django models
+- Sends email using `send_mail()` from Django
+
+📄 In `tracker/apps.py`:
+Auto-start scheduler when server starts:
+
+```python
+def ready(self):
+    if 'runserver' in sys.argv:
+        from tracker.scheduler import start_scheduler
+        start_scheduler()
+
+
+
 
 EXTRAS:
 
@@ -113,3 +150,15 @@ Note: horizontalBar is deprecated in Chart.js v3+, use bar with indexAxis: 'y'
 #006241
 #2E8B57
 #00674b
+
+
+| Use Case         | Color Code | Description                |
+| ---------------- | ---------- | -------------------------- |
+| Button (primary) | `#ff6f61`  | Coral pink                 |
+| Button hover     | `#e63946`  | Deeper coral               |
+| Title headings   | `#d63384`  | Bright pink / magenta tint |
+| Input border     | `#ff8c94`  | Soft pink border           |
+| Secondary button | `#6a5acd`  | Lavender purple            |
+| Secondary hover  | `#483d8b`  | Deep lavender              |
+| Highlights       | `#20c997`  | Minty sea green            |
+| Warnings/alerts  | `#ffa500`  | Orange                     |

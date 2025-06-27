@@ -4,4 +4,6 @@ pywebpush
 cryptography
 celery
 django-celery-beat
-redis
+apscheduler
+
+

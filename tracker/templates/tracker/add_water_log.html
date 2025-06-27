@@ -1,16 +1,80 @@
 {% extends "tracker/base.html" %}
 {% load static %}
-
 {% block content %}
 <link rel="stylesheet" href="{% static 'tracker/add_water_log.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="form-container">
-  <h2 class="form-title">💧 Log Water Intake</h2>
-  <form method="POST" class="form-box">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn-primary">💾 Save Exercise Log</button>
-  </form>
-  <a href="{% url 'dashboard' %}" class="btn-secondary">← Back to Dashboard</a>
+<div class="water-log-container">
+  <!-- Left Image Section -->
+  <div class="image-side">
+    <img src="{% static 'tracker/img/water.png' %}" alt="Hydration Image">
+  </div>
+
+  <!-- Right Content Section -->
+  <div class="content-side">
+    <h1 class="title">WATER LOG</h1>
+    <h2 class="subtitle"><strong>STAY HYDRATED<br>STAY HEALTHY</strong></h2>
+
+    <div class="hydration-circle">
+      <canvas id="hydrationChart" width="160" height="160"></canvas>
+      <div class="hydration-text">
+        <p class="percent" id="percentText">{{ percent|default:"0" }}%</p>
+        <p class="amount" id="amountText">{{ total_logged|default:"0" }}ml</p>
+        <p class="target">Goal: {{ goal|default:"1900" }}ml</p>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="preset-buttons">
+      <button onclick="setAmount(250)">+ WATER<br>(250ml)</button>
+    </div>
+
+    <!-- Input -->
+    <form method="POST" class="ml-form">
+      {% csrf_token %}
+      <label for="amount">Amount (ml):</label>
+      <input type="number" name="amount_ml" id="amount" required>
+      <button type="submit">💾 Save</button>
+    </form>
+
+    <a href="{% url 'dashboard' %}" class="back-btn">BACK TO DASHBOARD</a>
+  </div>
 </div>
+
+<script>
+  let currentAmount = 0;
+
+  function setAmount(val) {
+    currentAmount += val;
+    document.getElementById('amount').value = currentAmount;
+  }
+
+  // Chart logic
+  const logged = {{ total_logged|default:"0" }};
+  const goal = {{ goal|default:"1900" }};
+  const percent = Math.min((logged / goal) * 100, 200).toFixed(1);
+  const remaining = goal - logged > 0 ? goal - logged : 0;
+
+  document.getElementById("percentText").innerText = `${percent}%`;
+  document.getElementById("amountText").innerText = `${logged}ml`;
+
+  const hydrationChart = new Chart(document.getElementById('hydrationChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Hydrated', 'Remaining'],
+      datasets: [{
+        data: [logged, remaining],
+        backgroundColor: ['#ff6f61', '#fce4ec'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+</script>
+
 {% endblock %}

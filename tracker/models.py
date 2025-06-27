@@ -1,20 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth.models import User
-from django.db import models
+from django.utils import timezone
+
+
+
+class WellnessLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    activity_type = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
-    level = models.CharField(max_length=20, default='info')  # info, warning, success, error
+    level = models.CharField(max_length=20, default='info') 
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+
 class WaterLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-    amount_ml = models.IntegerField()
+    amount_ml = models.PositiveIntegerField()
+    date = models.DateField(default=timezone.now)
+    timestamp = models.DateTimeField(default=timezone.now)
 
     @property
     def search_text(self):
